@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1075566912106",
+    "project_id": "mobileapp-haveat",
+    "storage_bucket": "mobileapp-haveat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1075566912106:android:810c17f0d270c44a57a013",
+        "android_client_info": {
+          "package_name": "com.example.mobileapp_haveat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1075566912106-62op0qpi2pn9lbgngjjsvm34sh97tv98.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnlSe56E8gmoD5PrWfuIaZEHEduBvaUS4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1075566912106-62op0qpi2pn9lbgngjjsvm34sh97tv98.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
