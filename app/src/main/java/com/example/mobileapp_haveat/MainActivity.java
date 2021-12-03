@@ -17,12 +17,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    sleep(3000);
+                    sleep(3000);//screen freezes for 3 seconds
                 }
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                finally{
+                finally{//And then intens to login activity to login or register users.
                     Intent welcomeIntent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(welcomeIntent);
                 }

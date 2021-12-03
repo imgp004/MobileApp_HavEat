@@ -22,17 +22,18 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private Button DonarLoginBtn, DonarRegisterBtn;
+    private Button DonarLoginBtn, DonarRegisterBtn;//two buttons
     private TextView DonarRegisterLink, DonarStatus, Donar_orSigninWith, DonarHaveAccount;
-    private EditText DonarEmail, DonarPassword;
+    private EditText DonarEmail, DonarPassword;//input
     private ProgressDialog loading;
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;//reference to the firebase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //setting variables to particular IDs
         DonarLoginBtn = findViewById(R.id.donar_login_button);
         DonarRegisterBtn = findViewById(R.id.donar_register_button);
         DonarRegisterLink = findViewById(R.id.donar_newAccountLink);
@@ -42,12 +43,13 @@ public class LoginActivity extends AppCompatActivity {
         DonarPassword = findViewById(R.id.donar_login_password);
         DonarHaveAccount = findViewById(R.id.donar_haveAccount);
         loading = new ProgressDialog(this);
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance();//returns the current users instance
 
-        DonarRegisterBtn.setVisibility(View.INVISIBLE);
-        DonarHaveAccount.setVisibility(View.INVISIBLE);
-        DonarRegisterBtn.setEnabled(false);
+        DonarRegisterBtn.setVisibility(View.INVISIBLE);//setting register button invisible so user can only see login button.
+        DonarHaveAccount.setVisibility(View.INVISIBLE);//"Already have an account" text should be invisible while login
+        DonarRegisterBtn.setEnabled(false);//Register button won't function at this moment
 
+        //When user want to create new account, it will enable register button and "Already have account" text
         DonarRegisterLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,60 +64,66 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        //When login button is clicked,
         DonarLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String email = DonarEmail.getText().toString();
                 String password = DonarPassword.getText().toString();
 
+                //pass input email and password verify user
                 LoginDonar(email, password);
             }
         });
 
+        //when register button is clicked,
         DonarRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String email = DonarEmail.getText().toString();
                 String password = DonarPassword.getText().toString();
 
+                //pass input email and password verify user
                 RegisterDonar(email, password);
             }
         });
 
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        if(currentUser!=null){
-//            SendUserToDonarMainActivity();
-//        }
-//    }
+    //OnStart function will be called as the user enters this activity.
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser!=null){//We want to verify if the user is existing in our firebase
+            SendUserToDonarMainActivity();//then no need to sign in again.
+        }
+    }
 
     private void LoginDonar(String email, String password) {
 
-        if(TextUtils.isEmpty(email)){
+        if(TextUtils.isEmpty(email)){//If email is not entered, lt user know to enter it
             Toast.makeText(LoginActivity.this, "Please enter your email!", Toast.LENGTH_LONG).show();
         }
-        if(TextUtils.isEmpty(password)){
+        if(TextUtils.isEmpty(password)){//If password is not entered, lt user know to enter it
             Toast.makeText(LoginActivity.this, "Please enter your password!", Toast.LENGTH_LONG).show();
         }
-        else{
+        else{//then verify if these exists in firebase
             loading.show();
-            loading.setTitle("Donar Login");
+            loading.setTitle("User Login");//This is progress bar, displayed when app is verifying the user
             loading.setMessage("Please wait! Login is progress.");
+            //passing email and password to firebase
             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
+                public void onComplete(@NonNull Task<AuthResult> task) {//after the verification is completed
+                    if(task.isSuccessful()){//if successful, intent to home
                         loading.dismiss();
                         SendUserToDonarMainActivity();
                         Toast.makeText(LoginActivity.this, "You are Logged in!", Toast.LENGTH_LONG).show();
 
                     }
-                    else{
-                        Toast.makeText(LoginActivity.this, "Error! Try again.", Toast.LENGTH_LONG).show();
+                    else{//if fail, user need to register first
+                        Toast.makeText(LoginActivity.this, "Please check email and password.", Toast.LENGTH_LONG).show();
                         loading.dismiss();
                     }
                 }
@@ -124,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private void SendUserToDonarMainActivity() {
+    private void SendUserToDonarMainActivity() {//Intent to home activity
         Intent sendToHome = new Intent(LoginActivity.this, UserHome.class);
         sendToHome.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(sendToHome);
@@ -132,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void RegisterDonar(String email, String password) {
+    private void RegisterDonar(String email, String password) {//to register the user
 
         if(TextUtils.isEmpty(email)){
             Toast.makeText(LoginActivity.this, "Please enter your email!", Toast.LENGTH_LONG).show();
@@ -146,10 +154,11 @@ public class LoginActivity extends AppCompatActivity {
             loading.setMessage("Please wait! Registration is progress.");
             loading.show();
 
+            //generate a user by given email and password.
             mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
+                    if(task.isSuccessful()){//after saving info, user needs to login.
                         Toast.makeText(LoginActivity.this, "You are Registered!", Toast.LENGTH_LONG).show();
                         loading.dismiss();
                         DonarLoginBtn.setVisibility(View.VISIBLE);
@@ -159,7 +168,7 @@ public class LoginActivity extends AppCompatActivity {
                         DonarRegisterBtn.setVisibility(View.INVISIBLE);
                         DonarRegisterBtn.setEnabled(false);
                     }
-                    else{
+                    else{//error if internet connection has problems.
                         Toast.makeText(LoginActivity.this, "Error!", Toast.LENGTH_LONG).show();
                         loading.dismiss();
                     }

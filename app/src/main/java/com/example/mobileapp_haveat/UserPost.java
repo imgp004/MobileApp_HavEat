@@ -35,6 +35,7 @@ import java.util.HashMap;
 
 public class UserPost extends AppCompatActivity {
 
+    //Declaring variables
     private Button upload;
     private Button searchInDrive;
     private EditText Description;
@@ -53,6 +54,7 @@ public class UserPost extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_post);
 
+        //toolbar to show on top of screen
         toolbar = findViewById(R.id.post_appBarLayout);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -65,20 +67,30 @@ public class UserPost extends AppCompatActivity {
         Description = findViewById(R.id.postDescription);
         firebaseAuth = FirebaseAuth.getInstance();
         userId = firebaseAuth.getCurrentUser().getUid();
-        postRef = FirebaseStorage.getInstance().getReference();
-        userRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        postNode = FirebaseDatabase.getInstance().getReference().child("Posts");
+        postRef = FirebaseStorage.getInstance().getReference();//referentce to storage of this image
+        userRef = FirebaseDatabase.getInstance().getReference().child("Users");//reference to current user data
+        postNode = FirebaseDatabase.getInstance().getReference().child("Posts");//reference to current post info(time, date, des,..)
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==photo && resultCode==RESULT_OK && data !=null){
+            imgUri = data.getData();
+            imageView.setImageURI(imgUri);
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == android.R.id.home) {
-            Intent SendToHome = new Intent(UserPost.this, UserHome.class);
-            SendToHome.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(SendToHome);
-            finish();
+        if (id == android.R.id.home) {//send user to home screen
+            SendToHome();
+//            Intent SendToHome = new Intent(UserPost.this, UserHome.class);
+//            SendToHome.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(SendToHome);
+//            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -90,7 +102,7 @@ public class UserPost extends AppCompatActivity {
         startActivityForResult(goToGallery, photo);
     }
 
-    public void UploadPost(View view) {
+    public void UploadPost(View view) {//uploading the image
 
         description = Description.getText().toString();
         if (imgUri == null) {
@@ -98,14 +110,14 @@ public class UserPost extends AppCompatActivity {
         }
         if (TextUtils.isEmpty(description)) {
             Toast.makeText(UserPost.this, "Please write item description.", Toast.LENGTH_SHORT).show();
-        } else {
+        } else {//if selected, now we need to save imge in storage and database
             SaveImage();
             SavePostInfoInDatabase();
         }
 
     }
 
-    private void SaveImage() {
+    private void SaveImage() {//save image in storage
 
         Calendar date = Calendar.getInstance();
         SimpleDateFormat currDate = new SimpleDateFormat("MMMM-dd-yyyy");
@@ -140,7 +152,7 @@ public class UserPost extends AppCompatActivity {
         });
 
     }
-    private void SavePostInfoInDatabase() {
+    private void SavePostInfoInDatabase() {//put post info in post node of database so we can retrieve later
         userRef.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -180,13 +192,6 @@ public class UserPost extends AppCompatActivity {
         finish();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==photo && resultCode==RESULT_OK && data !=null){
-            imgUri = data.getData();
-            imageView.setImageURI(imgUri);
-        }
-    }
+
 
 }
